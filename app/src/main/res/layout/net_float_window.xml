@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/linearLayout"
+        android:layout_width="200dp"
+        android:layout_height="170dp"
+        android:background="@drawable/default_background">
+
+    <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/net_imageView"
+            android:layout_width="45dp"
+            android:layout_height="37dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_network_icon" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/net_close"
+            android:layout_width="45dp"
+            android:layout_height="37dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/net_imageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.73"
+            app:layout_constraintStart_toEndOf="@+id/tv_mem_title"
+            app:layout_constraintTop_toTopOf="@+id/net_imageView"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/ic_icon_close" />
+
+    <TextView
+            android:id="@+id/tv_eth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="40dp"
+            android:text="Eth Speed:"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/net_imageView" />
+
+    <TextView
+            android:id="@+id/tv_wifi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Wifi Speed:"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@+id/tv_eth"
+            app:layout_constraintTop_toBottomOf="@+id/tv_eth" />
+
+    <TextView
+            android:id="@+id/tv_eth_re_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="N/A"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_eth"
+            app:layout_constraintEnd_toEndOf="@+id/textView"
+            app:layout_constraintStart_toStartOf="@+id/textView"
+            app:layout_constraintTop_toTopOf="@+id/tv_eth"
+            app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+            android:id="@+id/tv_wifi_re_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="N/A"
+            android:textColor="@android:color/white"
+            app:layout_constraintStart_toStartOf="@+id/tv_eth_re_text"
+            app:layout_constraintTop_toTopOf="@+id/tv_wifi" />
+
+    <TextView
+            android:id="@+id/tv_net_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Net Monitor"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/net_imageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.503"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/net_imageView" />
+
+    <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:text="Receive"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/tv_net_title"
+            app:layout_constraintTop_toBottomOf="@+id/net_imageView" />
+
+    <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transmit"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/net_close"
+            app:layout_constraintTop_toTopOf="@+id/textView" />
+
+    <TextView
+            android:id="@+id/tv_eth_tr_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="N/A"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="@+id/net_close"
+            app:layout_constraintStart_toStartOf="@+id/net_close"
+            app:layout_constraintTop_toTopOf="@+id/tv_eth_re_text" />
+
+    <TextView
+            android:id="@+id/tv_wifi_tr_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="N/A"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="@+id/tv_eth_tr_text"
+            app:layout_constraintStart_toStartOf="@+id/tv_eth_tr_text"
+            app:layout_constraintTop_toTopOf="@+id/tv_wifi_re_text" />
+</androidx.constraintlayout.widget.ConstraintLayout>
