@@ -1,5 +1,6 @@
 package com.nathan.androidtvdeviceinfo.util;
 
+import android.os.Build;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -114,17 +115,19 @@ public class SystemUtils {
 
     /**
      * @return need System permission and modify selinux
+     * need this permission:Manifest.permission.READ_PRIVILEGED_PHONE_STATE
      */
     public static String getSerialNo(){
-        Log.i("zyf","*&********get serial start**********");
-        CommonUtils.CommandResult result = execCmd("getprop ro.serialno", false);
-        String name = "not";
-        if (result.result == 0) {
-            name = result.successMsg;
-            Log.i("zyf","*&*******aaaaa***********"+name);
-        }
-        Log.i("zyf","*&********get serial start end**********"+name);
-        return name;
+//        Log.i("zyf","*&********get serial start**********");
+//        CommonUtils.CommandResult result = execCmd("getprop ro.serialno", false);
+//        String name = "not";
+//        if (result.result == 0) {
+//            name = result.successMsg;
+//            Log.i("zyf","*&*******aaaaa***********"+name);
+//        }
+//        Log.i("zyf","*&********get serial start end**********"+name);
+//        return name;
+        return Build.getSerial();
     }
 
     /**
