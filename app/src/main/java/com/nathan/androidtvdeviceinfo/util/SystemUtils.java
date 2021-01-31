@@ -47,7 +47,10 @@ public class SystemUtils {
             in.close();
         } catch (IOException ex) {
             ex.printStackTrace();
-            result = "N/A";
+            result = null;
+        }
+        if (result == null){
+            return null;
         }
         return result.trim();
     }
@@ -69,14 +72,17 @@ public class SystemUtils {
             in.close();
         } catch (IOException ex) {
             ex.printStackTrace();
-            result = "N/A";
+            result = null;
+        }
+        if (result == null){
+            return null;
         }
         return result.trim();
     }
 
     // 实时获取CPU当前频率（单位KHZ）
     public static String getCurCpuFreq(int cpuNum) {
-        String result = "N/A";
+        String result = null;
         try {
             FileReader fr = new FileReader(
                     "/sys/devices/system/cpu/cpu"+cpuNum+"/cpufreq/scaling_cur_freq");
@@ -89,6 +95,22 @@ public class SystemUtils {
             e.printStackTrace();
         }
         return result;
+    }
+
+    public static String getCurCpuRate(int cpuNum){
+        String curFreq = getCurCpuFreq(cpuNum);
+        String minFreq = getMinCpuFreq();
+        String maxFreq = getMaxCpuFreq();
+        long curFreqNum = Integer.parseInt(curFreq.substring(0,curFreq.length()-3));
+        long minFreqNum = Integer.parseInt(minFreq.substring(0,minFreq.length()-3));
+        long maxFreqNum = Integer.parseInt(maxFreq.substring(0,maxFreq.length()-3));
+        Log.d("zyf", "getCurCpuRate: curFreq:"+curFreq+ "substring:"+curFreq.substring(0,curFreq.length()-3));
+        Log.d("zyf", "getCurCpuRate: minFreq:"+minFreq+" subString :"+minFreq.substring(0,minFreq.length()-3));
+        Log.d("zyf", "getCurCpuRate: maxFreq:"+maxFreq+" substring:"+maxFreq.substring(0,maxFreq.length()-3));
+        Log.d("zyf", "getCurCpuRate: curFreqNum:"+curFreqNum);
+
+        Log.d("zyf", "getCurCpuRate: rate:"+(curFreqNum - minFreqNum)*100/maxFreqNum);
+        return (curFreqNum - minFreqNum)*100/maxFreqNum+"%";
     }
 
     /**
@@ -127,6 +149,11 @@ public class SystemUtils {
 //        }
 //        Log.i("zyf","*&********get serial start end**********"+name);
 //        return name;
+        Log.i("zyf","*&********get serial start**********"+getSerialNoByBuild());
+        return getSerialNoByBuild();
+    }
+
+    private static String getSerialNoByBuild(){
         return Build.getSerial();
     }
 
@@ -141,41 +168,109 @@ public class SystemUtils {
                 return address;
             }
         }
-        return "N/A";
+        return null;
     }
 
     public static String getWifiMacAddress() {
         CommonUtils.CommandResult result = execCmd("cat /sys/class/net/" + "wlan0" + "/address", false);
         if (result.result == 0) {
             String address = result.successMsg;
-            if (address != null && address.length() > 0) {
+            if (address != null && address.length() > 0 && address.length() <18) {
+                Log.d("zyf", "getWifiMacAddress orig: "+address);
                 return address;
             }
         }
-        return "N/A";
+        return null;
     }
 
     public static String getEthIpAddress() {
-        CommonUtils.CommandResult result = execCmd("ifconfig eth0|sed -n '2p'|cut -c21-34", false);
+        CommonUtils.CommandResult result = CommonUtils.execCmd("ifconfig eth0|grep 'inet addr'|cut -d \":\" -f2|cut -d \" \" -f1", false);
         if (result.result == 0) {
             String address = result.successMsg;
-            if (address != null && address.length() > 0) {
+            if (address != null && isIp(address)) {
+                Log.d("zyf", "getEthIpAddress: "+address);
                 return address;
             }
         }
-        return "N/A";
+        return null;
+    }
+    public static String getGatewayAddress() {
+//        CommonUtils.CommandResult result = CommonUtils.execCmd("ip route show |cut -d \"/\" -f1", false);
+//        if (result.result == 0) {
+//            String address = result.successMsg;
+//            if (address != null && isIp(address)) {
+//                Log.d("zyf", "getEthGatewayAddress: "+address);
+//                return address;
+//            }
+//        }
+        CommonUtils.CommandResult result = CommonUtils.execCmd("ip route show ", false);
+        if (result.result == 0) {
+            String address = result.successMsg;
+            if (address != null ) {
+                String[] list = address.split("\n");
+                for (String item:list){
+                    if (item != null && item.contains("eth0")) {
+                        String[] gateway = item.split("/");
+                        if (address != null && isIp(gateway[0])) {
+                            return gateway[0];
+                        }
+                    }
+                    if (item != null && item.contains("wlan0")) {
+                        String[] gateway = item.split("/");
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static String getBcastAddress(boolean ethernet) {
+        String type = ethernet ==true?"eth0":"wlan0";
+        CommonUtils.CommandResult result = CommonUtils.execCmd("ifconfig "+type+"|grep 'inet addr'|cut -d \":\" -f3|cut -d \" \" -f1", false);
+        if (result.result == 0) {
+            String address = result.successMsg;
+            if (address != null && isIp(address)) {
+                Log.d("zyf", "getEthBcastAddress: "+address);
+                return address;
+            }
+        }
+        return null;
+    }
+
+    public static String getMaskAddress(boolean ethernet) {
+        String type = ethernet ==true?"eth0":"wlan0";
+        CommonUtils.CommandResult result = CommonUtils.execCmd("ifconfig "+type+"|grep 'inet addr'|cut -d \":\" -f4|cut -d \" \" -f1", false);
+        Log.d("zyf", "getMaskAddress: result:"+result.result);
+        Log.d("zyf", "getMaskAddress: result success:"+result.successMsg);
+        Log.d("zyf", "getMaskAddress: result error:"+result.errorMsg);
+        if (result.result == 0) {
+            String address = result.successMsg;
+            if (address != null && isIp(address)) {
+                Log.d("zyf", "getEthMaskAddress: "+address);
+                return address;
+            }
+        }
+        return null;
     }
 
     public static String getWifiIpAddress() {
-        CommonUtils.CommandResult result = execCmd("ifconfig wlan0|sed -n '2p'|cut -c21-34", false);
+        CommonUtils.CommandResult result = CommonUtils.execCmd("ifconfig wlan0|grep 'inet addr'|cut -d \":\" -f2|cut -d \" \" -f1", false);
         if (result.result == 0) {
             String address = result.successMsg;
-            if (address != null && address.length() > 0) {
+            if (address != null && isIp(address)) {
+                Log.d("zyf", "getWifiIpAddress: "+address);
                 return address;
             }
         }
-        return "N/A";
+        return null;
     }
+
+    private static boolean isIp(String ip) {
+        boolean b1 = ip.trim().matches("(?=(\\b|\\D))(((\\d{1,2})|(1\\d{1,2})|(2[0-4]\\d)|(25[0-5]))\\.){3}((\\d{1,2})|(1\\d{1,2})|(2[0-4]\\d)|(25[0-5]))(?=(\\b|\\D))");
+        Log.d("zyf", "v4: b1 " + b1);
+        return b1;
+    }
+
 
     /**
      * @return need setenforce 0
@@ -189,7 +284,16 @@ public class SystemUtils {
                 return address;
             }
         }
-        return "N/A";
+        return null;
+    }
+
+    public String HS_GetCpuTemp() {
+        String cmd = "cat /sys/class/thermal/thermal_zone0/temp";
+        String temp =  NonSystemUtils.exeShellCmd(cmd);
+        if (temp.contains("N/A") || temp.contains("")){
+            return "-1";
+        }
+        return Integer.parseInt(temp)/1000.0+"";
     }
 
 
@@ -201,7 +305,7 @@ public class SystemUtils {
                 return name;
             }
         }
-        return "N/A";
+        return null;
     }
 
     /**

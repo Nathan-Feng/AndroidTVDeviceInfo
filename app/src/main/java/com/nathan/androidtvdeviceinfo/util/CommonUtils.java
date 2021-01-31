@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.provider.Settings;
 import android.util.Log;
 
+import androidx.core.content.ContextCompat;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
@@ -17,8 +19,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-
-import androidx.core.content.ContextCompat;
 
 /**
  * 不需要签名就可以调用的工具类。
@@ -239,6 +239,9 @@ public class CommonUtils {
                 process.destroy();
             }
         }
+        if (successMsg == null || successMsg.toString().equals("")){
+            result = -1;
+        }
         return new CommandResult(
                 result,
                 successMsg == null ? "" : successMsg.toString(),
@@ -262,8 +265,8 @@ public class CommonUtils {
 
         @Override
         public String toString() {
-            return "result: " + result + "\n" +
-                    "successMsg: " + successMsg + "\n" +
+            return "result: " + result  +
+                    "successMsg: " + successMsg  +
                     "errorMsg: " + errorMsg;
         }
     }

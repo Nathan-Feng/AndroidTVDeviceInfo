@@ -1,4 +1,7 @@
 package com.nathan.androidtvdeviceinfo.apipresenter;
+import android.content.Context;
+
+import androidx.annotation.NonNull;
 
 public interface SystemDeviceInfoApi {
 
@@ -17,6 +20,9 @@ public interface SystemDeviceInfoApi {
      * @return
      */
     String getCurCpuFreq(int cpuNum);
+
+
+    String getCurCpuRate(int cpuNum);
 
     /**
      * @return TODO
@@ -60,4 +66,23 @@ public interface SystemDeviceInfoApi {
      *      * [1][1] == wifi send
      */
     String[][] getAllNetData();
+
+    String getCpuUseRate();
+
+    boolean forceSystemWakeUp(Context context);
+    boolean forceSystemStandby(Context context);
+
+    boolean isSystemStandby(Context context);
+
+    boolean forceSystemReboot(Context context);
+
+    void factoryReset(Context context);
+
+    String[] getSystemProcessPid(String processName);
+    boolean killSystemProcessPid(int pid);
+
+    String[] getRootProcessPid(String processName);
+    boolean killRootProcessPid(int pid);
+
+    void uninstallPkg(Context context,@NonNull String pkgName);
 }

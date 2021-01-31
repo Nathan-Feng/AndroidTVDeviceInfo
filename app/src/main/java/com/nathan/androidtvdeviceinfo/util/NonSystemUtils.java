@@ -3,6 +3,7 @@ package com.nathan.androidtvdeviceinfo.util;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -12,11 +13,13 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.WindowManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 
@@ -59,7 +62,7 @@ public class NonSystemUtils {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        return cpuInfo + "\n";
+        return cpuInfo ;
     }
 
 
@@ -70,12 +73,7 @@ public class NonSystemUtils {
      * @return 内存信息
      */
     public static String getFreeMemInfo(Context context) {
-        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        ActivityManager activityManager =
-                (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
-        activityManager.getMemoryInfo(memoryInfo);
-
-        Runtime runtime = Runtime.getRuntime();
+        ActivityManager.MemoryInfo memoryInfo = getMemInfo(context);
 
         String strMemInfo =CommonUtils.getFileSizeDescription(memoryInfo.availMem);// API 16
 
@@ -83,16 +81,28 @@ public class NonSystemUtils {
     }
 
     public static String getTotalMemInfo(Context context) {
-        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        ActivityManager activityManager =
-                (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
-        activityManager.getMemoryInfo(memoryInfo);
 
-        Runtime runtime = Runtime.getRuntime();
+        ActivityManager.MemoryInfo memoryInfo = getMemInfo(context);
 
         String strMemInfo =CommonUtils.getFileSizeDescription(memoryInfo.totalMem);
 
         return strMemInfo;
+    }
+
+    public static String getMemUsePercent(Context context){
+        long totalMem = getMemInfo(context).totalMem;
+        long availMem = getMemInfo(context).availMem;
+        long ret = (availMem*100/totalMem);
+        Log.d("zyf", "getMemUsePercent:totalMem: "+totalMem+" aviMem:"+availMem+" ret:"+ret);
+        return (availMem*100/totalMem)+"%";
+    }
+
+    private static ActivityManager.MemoryInfo getMemInfo(Context context){
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        ActivityManager activityManager =
+                (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+        activityManager.getMemoryInfo(memoryInfo);
+        return memoryInfo;
     }
 
 
@@ -187,9 +197,9 @@ public class NonSystemUtils {
             StatFs stat = new StatFs(path.getPath());
             long blockSize = stat.getBlockSize();
             long totalBlocks = stat.getBlockCount();
-            return "SD Total Space: " + CommonUtils.getFileSizeDescription(totalBlocks * blockSize) + "\n";
+            return CommonUtils.getFileSizeDescription(totalBlocks * blockSize) ;
         } else {
-            return "N/A" + "\n";
+            return null;
         }
     }
 
@@ -206,17 +216,57 @@ public class NonSystemUtils {
             long blockSize, availableBlocks;
             availableBlocks = stat.getAvailableBlocksLong();
             blockSize = stat.getBlockSizeLong();
-            return "SDcard Free Space:" + CommonUtils.getFileSizeDescription(availableBlocks * blockSize) + "\n";
+            return CommonUtils.getFileSizeDescription(availableBlocks * blockSize) ;
         } else {
-            return "N/A";
+            return null;
         }
     }
+
+    public static String getRateExternalFlashSize() {
+        Log.d("zyf", "getRateExternalFlashSize: enter");
+        if (isSDCardEnable()) {
+            Log.d("zyf", "getRateExternalFlashSize: sdcard enable");
+            File path = Environment.getExternalStorageDirectory();
+            StatFs stat = new StatFs(path.getPath());
+            long  availableBlocks;
+            availableBlocks = stat.getAvailableBlocksLong();
+            //blockSize = stat.getBlockSizeLong();
+            long totalBlocks = stat.getBlockCount();
+            double rate = 1.0-((double)availableBlocks/totalBlocks);
+            DecimalFormat df = new DecimalFormat("0.00%");
+            String ret = df.format(rate);
+//            String percent = String.format("%.2f",rate);
+//            int ret = (int)Long.parseLong(percent)*100;
+            Log.d("zyf", "getRateExternalFlashSize: sdcard ret:"+ret);
+            return ret;
+        } else {
+            Log.d("zyf", "getRateExternalFlashSize: sdcard not enable");
+            return null;
+        }
+    }
+
+    public static String getUsedExternalFlashSize() {
+        if (isSDCardEnable()) {
+            File path = Environment.getExternalStorageDirectory();
+            StatFs stat = new StatFs(path.getPath());
+            long  blockSize, availableBlocks;
+            availableBlocks = stat.getAvailableBlocksLong();
+            blockSize = stat.getBlockSizeLong();
+            long totalBlocks = stat.getBlockCount();
+            return CommonUtils.getFileSizeDescription((totalBlocks-availableBlocks) * blockSize) ;
+        } else {
+            return null;
+        }
+    }
+
 
     public static String exeShellCmd(String cmd){
         CommonUtils.CommandResult result = CommonUtils.execCmd(cmd.trim(), false);
         String name = "N/A";
         if (result.result == 0) {
             name = result.successMsg;
+        } else {
+            name = result.errorMsg;
         }
         return name;
     }
@@ -227,7 +277,7 @@ public class NonSystemUtils {
      */
     public static String getProp(){
         CommonUtils.CommandResult result = CommonUtils.execCmd("getprop", false);
-        String name = "N/A";
+        String name = null;
         if (result.result == 0) {
             name = result.successMsg;
         }

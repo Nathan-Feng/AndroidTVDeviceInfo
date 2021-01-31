@@ -26,6 +26,8 @@ public interface NonSystemDeviceInfoApi {
      */
     String getTotalMemInfo(Context context);
 
+    String getPercentMemInfo(Context context);
+
     int getScreenWidth(Context context);
     int getScreenHeight(Context context);
     float getScreenDensity();
@@ -62,4 +64,6 @@ public interface NonSystemDeviceInfoApi {
     int convertDpToPixel(int dp, Context context);
 
     int convertPixelsToDp(int px, Context context);
+
+    String[] getSystemLogcatPids();
 }
